@@ -5,8 +5,12 @@ import { analyzeCV } from './services/analyzeCV'
 import UploadZone from './components/UploadZone'
 import CVCard from './components/CVCard'
 import CVDetailModal from './components/CVDetailModal'
+import {
+  IconKey, IconEye, IconEyeOff, IconSpinner, IconDocument,
+  IconClipboard, IconWarning, IconX,
+} from './components/Icons'
 
-// ─── Provider Selector + API Key Banner ──────────────────────────────────────
+// ─── Config Banner ────────────────────────────────────────────────────────────
 function ConfigBanner({
   provider, onProvider,
   apiKey, onApiKey,
@@ -20,21 +24,21 @@ function ConfigBanner({
   const cfg = PROVIDERS.find((p) => p.id === provider)!
 
   return (
-    <div className="bg-gray-900 border-b border-gray-800">
+    <div className="bg-[#0F172A] border-b border-[#334155]">
       {/* Provider tabs */}
-      <div className="flex items-center gap-2 px-6 pt-3 pb-2">
-        <span className="text-xs text-gray-600 mr-1 shrink-0">Model</span>
-        <div className="flex gap-1 bg-gray-800/60 rounded-xl p-1">
+      <div className="flex items-center gap-3 px-6 pt-3 pb-2">
+        <span className="text-xs text-[#94A3B8] shrink-0 font-medium">Model</span>
+        <div className="flex gap-1 bg-[#020817] rounded-xl p-1 border border-[#334155]">
           {PROVIDERS.map((p) => (
             <button
               key={p.id}
               onClick={() => onProvider(p.id)}
-              className={`
-                px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-                ${provider === p.id
-                  ? 'bg-gray-700 text-white shadow'
-                  : 'text-gray-500 hover:text-gray-300'}
-              `}
+              className={[
+                'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer',
+                provider === p.id
+                  ? 'bg-[#1E293B] text-[#F8FAFC] shadow-sm border border-[#334155]'
+                  : 'text-[#94A3B8] hover:text-[#F8FAFC]',
+              ].join(' ')}
             >
               <span className={provider === p.id ? p.color : ''}>{p.icon}</span>
               {' '}{p.name}
@@ -43,12 +47,9 @@ function ConfigBanner({
         </div>
       </div>
 
-      {/* Key + optional endpoint */}
-      <div className="flex items-center gap-3 px-6 pb-3">
-        <svg className="w-4 h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-        </svg>
+      {/* Key row */}
+      <div className="flex items-center gap-3 px-6 pb-3 flex-wrap">
+        <IconKey className="w-4 h-4 text-[#94A3B8] shrink-0" />
 
         {/* API key input */}
         <div className="relative w-72">
@@ -57,16 +58,20 @@ function ConfigBanner({
             value={apiKey}
             onChange={(e) => onApiKey(e.target.value)}
             placeholder={cfg.keyPlaceholder}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs
-                       text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 pr-8"
+            className="w-full bg-[#020817] border border-[#334155] rounded-xl px-3 py-1.5 pr-9
+                       text-xs text-[#F8FAFC] placeholder-[#94A3B8]/50
+                       focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] focus:border-[#0EA5E9]
+                       transition-colors duration-150"
           />
           <button
             type="button"
             onClick={() => setShowKey((s) => !s)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 text-sm"
             tabIndex={-1}
+            aria-label={showKey ? 'Hide API key' : 'Show API key'}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94A3B8]
+                       hover:text-[#F8FAFC] transition-colors duration-150 cursor-pointer"
           >
-            {showKey ? '🙈' : '👁'}
+            {showKey ? <IconEyeOff className="w-3.5 h-3.5" /> : <IconEye className="w-3.5 h-3.5" />}
           </button>
         </div>
 
@@ -77,17 +82,21 @@ function ConfigBanner({
             value={endpoint}
             onChange={(e) => onEndpoint(e.target.value)}
             placeholder="https://your-resource.openai.azure.com/openai/deployments/gpt-4o"
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs
-                       text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="flex-1 min-w-[260px] bg-[#020817] border border-[#334155] rounded-xl px-3 py-1.5
+                       text-xs text-[#F8FAFC] placeholder-[#94A3B8]/50
+                       focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] focus:border-[#0EA5E9]
+                       transition-colors duration-150"
           />
         )}
 
-        {/* Status */}
-        {!apiKey && (
-          <span className="text-xs text-amber-500">Enter your API key to start analyzing</span>
-        )}
-        {apiKey && (
-          <span className={`text-xs font-medium ${cfg.color}`}>
+        {/* Status indicator */}
+        {!apiKey ? (
+          <span className="flex items-center gap-1.5 text-xs text-amber-400">
+            <IconWarning className="w-3.5 h-3.5" />
+            Enter your API key to start analyzing
+          </span>
+        ) : (
+          <span className={`text-xs font-semibold ${cfg.color}`}>
             ✓ {cfg.name} ready
           </span>
         )}
@@ -96,7 +105,7 @@ function ConfigBanner({
   )
 }
 
-// ─── App ─────────────────────────────────────────────────────────────────────
+// ─── App ──────────────────────────────────────────────────────────────────────
 let idCounter = 0
 
 function storageKey(provider: Provider) { return `cv_apikey_${provider}` }
@@ -125,7 +134,6 @@ export default function App() {
     else sessionStorage.removeItem('cv_endpoint')
   }, [])
 
-  // Allow uploading at any time — no lock, no disabled state while analyzing
   const handleFiles = useCallback(async (files: File[]) => {
     if (!apiKey) { alert('Please enter your API key first.'); return }
 
@@ -151,7 +159,6 @@ export default function App() {
 
     setCvs((prev) => [...prev, ...newCvs])
 
-    // Capture current values to avoid stale closures
     const currentProvider = provider
     const currentKey = apiKey
     const currentEndpoint = endpoint
@@ -182,73 +189,94 @@ export default function App() {
   const doneCvs = sorted.filter((c) => c.status === 'done')
   const analyzingCount = cvs.filter((c) => c.status === 'analyzing').length
   const rankOf = (cv: CVAnalysis) => doneCvs.findIndex((c) => c.id === cv.id) + 1
-
   const cfg = PROVIDERS.find((p) => p.id === provider)!
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between shrink-0">
+    <div className="min-h-screen flex flex-col bg-[#020817]">
+
+      {/* ── Header ── */}
+      <header className="bg-[#0F172A] border-b border-[#334155] px-6 py-4
+                         flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">📋</span>
+          <div className="w-9 h-9 rounded-xl bg-[#0EA5E9]/15 border border-[#0EA5E9]/25
+                          flex items-center justify-center glow-accent-sm">
+            <IconClipboard className="w-5 h-5 text-[#0EA5E9]" />
+          </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-100">CV Ranking Portal</h1>
-            <p className={`text-xs font-medium ${cfg.color}`}>
+            <h1 className="text-base font-bold text-[#F8FAFC] leading-tight">CV Ranking Portal</h1>
+            <p className={`text-xs font-semibold ${cfg.color}`}>
               {cfg.icon} {cfg.name}
             </p>
           </div>
         </div>
+
         {cvs.length > 0 && (
           <button
             onClick={handleClear}
-            className="text-xs text-gray-600 hover:text-red-400 transition-colors px-3 py-1.5
-                       border border-gray-800 hover:border-red-900 rounded-lg"
+            className="flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-red-400
+                       transition-colors duration-150 px-3 py-1.5 border border-[#334155]
+                       hover:border-red-900/50 rounded-xl cursor-pointer"
           >
+            <IconX className="w-3.5 h-3.5" />
             Clear all
           </button>
         )}
       </header>
 
-      {/* Config banner */}
+      {/* ── Config Banner ── */}
       <ConfigBanner
         provider={provider} onProvider={handleProvider}
         apiKey={apiKey} onApiKey={(k) => handleApiKey(k, provider)}
         endpoint={endpoint} onEndpoint={handleEndpoint}
       />
 
-      {/* Main */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 space-y-8">
+      {/* ── Main content ── */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 space-y-6">
+
         <UploadZone onFiles={handleFiles} disabled={!apiKey} />
 
-        {/* Progress */}
+        {/* Analyzing progress */}
         {analyzingCount > 0 && (
-          <div className="flex items-center gap-3 text-sm text-indigo-400">
-            <svg className="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Analyzing {analyzingCount} CV{analyzingCount > 1 ? 's' : ''} with {cfg.name}… You can upload more while waiting.
+          <div className="flex items-center gap-3 text-sm text-[#0EA5E9]
+                          bg-[#0EA5E9]/8 border border-[#0EA5E9]/20 rounded-xl px-4 py-3">
+            <IconSpinner className="w-4 h-4 shrink-0" />
+            <span>
+              Analyzing{' '}
+              <span className="font-bold">{analyzingCount}</span>
+              {' '}CV{analyzingCount > 1 ? 's' : ''} with{' '}
+              <span className="font-bold">{cfg.name}</span>…
+              <span className="text-[#94A3B8] ml-1.5">You can upload more while waiting.</span>
+            </span>
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats bar */}
         {doneCvs.length > 0 && (
-          <div className="flex items-center gap-6 text-sm flex-wrap">
-            <span className="text-gray-500">{doneCvs.length} CV{doneCvs.length > 1 ? 's' : ''} ranked</span>
-            <span className="text-gray-700">·</span>
-            <span className="text-gray-500">
-              Top score: <span className="text-emerald-400 font-semibold">{doneCvs[0]?.totalScore}/100</span>
-            </span>
-            <span className="text-gray-700">·</span>
-            <span className="text-gray-500">
-              Avg: <span className="text-blue-400 font-semibold">
+          <div className="flex items-center gap-4 text-sm flex-wrap">
+            <div className="flex items-center gap-2 bg-[#0F172A] border border-[#334155]
+                            rounded-xl px-4 py-2">
+              <IconDocument className="w-4 h-4 text-[#94A3B8]" />
+              <span className="text-[#94A3B8]">
+                <span className="font-bold text-[#F8FAFC]">{doneCvs.length}</span>
+                {' '}CV{doneCvs.length !== 1 ? 's' : ''} ranked
+              </span>
+            </div>
+            <div className="flex items-center gap-2 bg-[#0F172A] border border-[#334155]
+                            rounded-xl px-4 py-2">
+              <span className="text-[#94A3B8]">Top score</span>
+              <span className="font-bold text-[#22C55E]">{doneCvs[0]?.totalScore}/100</span>
+            </div>
+            <div className="flex items-center gap-2 bg-[#0F172A] border border-[#334155]
+                            rounded-xl px-4 py-2">
+              <span className="text-[#94A3B8]">Average</span>
+              <span className="font-bold text-[#0EA5E9]">
                 {Math.round(doneCvs.reduce((s, c) => s + c.totalScore, 0) / doneCvs.length)}/100
               </span>
-            </span>
+            </div>
           </div>
         )}
 
-        {/* Grid */}
+        {/* CV grid */}
         {sorted.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {sorted.map((cv) => (
@@ -262,14 +290,24 @@ export default function App() {
           </div>
         )}
 
+        {/* Empty state */}
         {cvs.length === 0 && (
-          <div className="text-center py-16 text-gray-700">
-            <p className="text-4xl mb-3">🗂️</p>
-            <p className="text-sm">Upload CVs to get started — you can select multiple at once</p>
+          <div className="text-center py-20 flex flex-col items-center gap-4">
+            <div className="w-20 h-20 rounded-3xl bg-[#0F172A] border border-[#334155]
+                            flex items-center justify-center">
+              <IconDocument className="w-10 h-10 text-[#334155]" />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-sm font-semibold text-[#94A3B8]">No CVs uploaded yet</p>
+              <p className="text-xs text-[#334155]">
+                Upload one or more PDF files above to get started
+              </p>
+            </div>
           </div>
         )}
       </main>
 
+      {/* Detail modal */}
       {selected && selected.status === 'done' && (
         <CVDetailModal cv={selected} rank={rankOf(selected)} onClose={() => setSelected(null)} />
       )}

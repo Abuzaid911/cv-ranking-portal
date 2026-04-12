@@ -3,24 +3,59 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary:   #0369A1;
+    --color-accent:    #0EA5E9;
+    --color-cta:       #22C55E;
+    --color-bg:        #020817;
+    --color-surface:   #0F172A;
+    --color-card:      #1E293B;
+    --color-border:    #334155;
+    --color-text:      #F8FAFC;
+    --color-muted:     #94A3B8;
+  }
+
+  html { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+
   body {
-    @apply bg-gray-950 text-gray-100 min-h-screen;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    @apply border-slate-700;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #374151 transparent;
+    scrollbar-color: #334155 transparent;
   }
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #374151;
+    background: #334155;
     border-radius: 3px;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.15);
+  }
+  .glow-accent-sm {
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.1);
+  }
+  .glow-green {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
   }
 }
