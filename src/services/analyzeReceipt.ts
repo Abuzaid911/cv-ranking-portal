@@ -123,8 +123,7 @@ function parseJSON(raw: string): object {
 // ─── Provider-specific calls ──────────────────────────────────────────────────
 
 async function callGemini(apiKey: string, input: InputPayload): Promise<object> {
-  // Use gemini-2.0-flash — a stable, vision-capable model
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`
   const parts: object[] =
     input.kind === 'image'
       ? [

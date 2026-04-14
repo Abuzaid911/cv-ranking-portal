@@ -67,7 +67,7 @@ function parseJSON(raw: string): object {
 // Provider API calls
 // ---------------------------------------------------------------------------
 async function callGemini(apiKey: string, cvText: string): Promise<object> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -21,7 +21,7 @@ export const PROVIDERS: ProviderConfig[] = [
     icon: '✦',
     color: 'text-blue-400',
     keyPlaceholder: 'AIzaSy…',
-    defaultModel: 'gemini-3.1-flash-lite-preview',
+    defaultModel: 'gemini-3-flash-preview',
   },
   {
     id: 'anthropic',
