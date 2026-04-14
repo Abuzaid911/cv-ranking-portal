@@ -50,6 +50,8 @@ export const PROVIDERS: ProviderConfig[] = [
   },
 ]
 
+// ─── CV Types ─────────────────────────────────────────────────────────────────
+
 export interface CVAnalysis {
   id: string
   fileName: string
@@ -69,4 +71,49 @@ export interface CVAnalysis {
   status: CVStatus
   provider?: Provider
   error?: string
+}
+
+// ─── Receipt Types ────────────────────────────────────────────────────────────
+
+export interface ReceiptLineItem {
+  name: string
+  quantity: number
+  unitPrice: number
+  total: number
+}
+
+export type ReceiptStatus = 'analyzing' | 'done' | 'error'
+
+export interface ReceiptAnalysis {
+  id: string
+  fileName: string
+  fileUrl: string
+  fileType: 'image' | 'pdf'
+  status: ReceiptStatus
+  error?: string
+  provider: Provider
+  // Merchant
+  merchantName: string
+  merchantAddress: string
+  merchantPhone: string
+  // Transaction
+  date: string        // YYYY-MM-DD
+  time: string        // HH:MM
+  receiptNumber: string
+  // Financials
+  currency: string    // ISO 4217 e.g. USD
+  subtotal: number
+  tax: number
+  tip: number
+  discount: number
+  total: number
+  // Payment
+  paymentMethod: string
+  cardLast4: string
+  // Classification
+  category: string
+  // Details
+  lineItems: ReceiptLineItem[]
+  flags: string[]
+  summary: string
 }
